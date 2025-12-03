@@ -1,0 +1,157 @@
+{
+  "permissions": {
+    "allowedTools": [
+      "Read",
+      "Write",
+      "Edit",
+      "Bash",
+      "Glob",
+      "Grep",
+      "TodoRead",
+      "TodoWrite",
+      "WebSearch",
+      "Agent",
+      "Task"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./secrets/**)",
+      "Read(./**/credentials*)",
+      "Write(./.env)",
+      "Write(./.env.*)"
+    ]
+  },
+  "env": {
+    "CLAUDE_CODE_ENABLE_TELEMETRY": "1",
+    "OBSERVABILITY_SERVER": "http://localhost:4000"
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python ~/.claude/hooks/pre_tool_use.py"
+          },
+          {
+            "type": "command",
+            "command": "python ~/.claude/hooks/send_event.py --event-type PreToolUse"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python ~/.claude/hooks/post_tool_use.py | python ~/.claude/hooks/send_event.py --event-type PostToolUse"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python ~/.claude/hooks/send_event.py --event-type UserPromptSubmit"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python ~/.claude/hooks/send_event.py --event-type SubagentStop"
+          }
+        ]
+      }
+    ],
+    "ProtocolEvent": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python ~/.claude/hooks/send_event.py --event-type ProtocolEvent"
+          }
+        ]
+      }
+    ],
+    "QualityGate": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python ~/.claude/hooks/send_event.py --event-type QualityGate"
+          }
+        ]
+      }
+    ],
+    "AgentHandoff": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python ~/.claude/hooks/send_event.py --event-type AgentHandoff"
+          }
+        ]
+      }
+    ],
+    "MemoryOperation": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python ~/.claude/hooks/send_event.py --event-type MemoryOperation"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python ~/.claude/hooks/send_event.py --event-type Stop --add-chat"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python ~/.claude/hooks/send_event.py --event-type SessionStart"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python ~/.claude/hooks/send_event.py --event-type SessionEnd"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python ~/.claude/hooks/send_event.py --event-type Notification"
+          }
+        ]
+      }
+    ]
+  }
+}

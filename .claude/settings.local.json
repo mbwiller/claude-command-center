@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(for dir in \"C:\\Users\\Matt Willer\\claude-code-command-center\\claude-code-templates-analysis\\cli-tool\\components\\hooks\"/*)",
+      "Bash(do if [ -d \"$dir\" ])",
+      "Bash(cat:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
