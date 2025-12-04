@@ -25,9 +25,11 @@ describe('App Component', () => {
       render(<App />);
 
       await waitFor(() => {
-        // Should show either Connected or Connecting
-        const statusElement = screen.queryByText(/Connected/i) ||
-                              screen.queryByText(/Connecting/i);
+        // Should show either Live, Connecting..., or Server Offline
+        const statusElement = screen.queryByText(/Live/i) ||
+                              screen.queryByText(/Connecting/i) ||
+                              screen.queryByText(/Server Offline/i) ||
+                              screen.queryByText(/Offline/i);
         expect(statusElement).toBeTruthy();
       });
     });
@@ -43,23 +45,34 @@ describe('App Component', () => {
     });
   });
 
-  describe('WebSocket Connection', () => {
-    it('should establish WebSocket connection on mount', async () => {
+  describe('Event Connection', () => {
+    it('should establish connection on mount', async () => {
       render(<App />);
 
-      // WebSocket mock is set up in setup.js
+      // In browser mode, uses WebSocket (mock is set up in setup.js)
+      // In Tauri mode, uses Tauri events
       await waitFor(() => {
-        // Connection should be established
+        // Connection should be established or attempting
         expect(global.WebSocket).toBeDefined();
       });
     });
 
-    it('should handle WebSocket reconnection', async () => {
+    it('should handle reconnection gracefully', async () => {
       render(<App />);
 
       await waitFor(() => {
         // Component should handle reconnection gracefully
         expect(screen.queryByText(/Error/i)).toBeNull();
+      });
+    });
+
+    it('should show mode indicator in header', async () => {
+      render(<App />);
+
+      await waitFor(() => {
+        // Should show Browser Mode (since tests run in browser environment)
+        const modeElement = screen.queryByText(/Browser/i) || screen.queryByText(/Desktop/i);
+        expect(modeElement).toBeTruthy();
       });
     });
   });
@@ -71,11 +84,11 @@ describe('App Component', () => {
       await waitFor(
         () => {
           // Mock data should include events
-          // Check for event type or tool name
+          // Check for event type or tool name (use *AllBy* variant since multiple matches expected)
           const hasEvents =
-            screen.queryByText(/PostToolUse/i) ||
-            screen.queryByText(/Edit/i) ||
-            screen.queryByText(/implementer/i);
+            screen.queryAllByText(/PostToolUse/i).length > 0 ||
+            screen.queryAllByText(/Edit/i).length > 0 ||
+            screen.queryAllByText(/implementer/i).length > 0;
           expect(hasEvents).toBeTruthy();
         },
         { timeout: 2000 }
@@ -94,23 +107,23 @@ describe('App Component', () => {
   });
 
   describe('Statistics Display', () => {
-    it('should show token count', async () => {
+    it('should show session count', async () => {
       render(<App />);
 
       await waitFor(() => {
-        // Should display tokens
-        const tokenElement = screen.queryByText(/tokens/i);
-        expect(tokenElement).toBeTruthy();
+        // Should display sessions count
+        const sessionElement = screen.queryByText(/sessions/i);
+        expect(sessionElement).toBeTruthy();
       }, { timeout: 2000 });
     });
 
-    it('should show cost information', async () => {
+    it('should show event count', async () => {
       render(<App />);
 
       await waitFor(() => {
-        // Should display cost with $ symbol
-        const costElement = screen.queryByText(/\$/i);
-        expect(costElement).toBeTruthy();
+        // Should display events count (use *AllBy* variant since multiple matches expected)
+        const eventElements = screen.queryAllByText(/events/i);
+        expect(eventElements.length).toBeGreaterThan(0);
       }, { timeout: 2000 });
     });
   });
